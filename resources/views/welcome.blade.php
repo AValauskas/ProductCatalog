@@ -36,6 +36,7 @@ if (isset($_SESSION['userid']))
         <th>Name</th>
         <th>SKU</th>
         <th>description</th>
+        <th>base price</th>
         <th>Discount</th>
         <th>Edit</th>
         <th>Delete</th>
@@ -53,6 +54,7 @@ $idd =$row['SKU'];?>
     <td><?php echo $row['name'];  ?></td>
     <td><?php echo "$idd"; ?></td>
     <td><?php echo $row['description'];?></td>
+    <td><?php echo $row['base_price'];?></td>
     <td><?php echo $row['discount'];?></td>
     <td> <?php echo" <a href=../public/editProduct?id=",urlencode($idd),"><input type=button class='btn btn-lg' id='$idd' value='Edit' ></a> " ?></td>
     <td> <?php echo" <a href=../public/deleteProduct?id=",urlencode($idd),"><input type=button class='btn btn-lg' id='$idd' value='Delete' ></a> " ?></td>
@@ -83,15 +85,59 @@ $idd =$row['SKU'];?>
 ?>
 
 <table class="table table-hover" id="myTable">
+    <thead>
+    <tr class="header">
+        <th>name</th>
+        <th>SKU</th>
+        <th>Price</th>
+        <th>Rate</th>
+        <th>Reviews count</th>
+
+    </tr>
+
+    </thead>
+
     <tbody>
     <?php
     while($row = mysqli_fetch_array($datauser)) {
     $idd =$row['SKU'];
+
+    $ratesql="select AVG(number) as avg from rate where fk_ProductSKU='$idd'";
+    $ratedata = mysqli_query($dbc, $ratesql);
+    $rowrate = mysqli_fetch_assoc($ratedata);
+
+
+    $revsql="select count(text) as txt from review where fk_ProductSKU='$idd'";
+    $revdata = mysqli_query($dbc, $revsql);
+    $rowrev = mysqli_fetch_assoc($revdata);
+
+
+    if($row['tax']==1 && $row['discount']>0)
+        {
+            //yra pvm
+            $firstprice= $price=$row['base_price']+$row['base_price']*$rowtax['taxp']/100;
+            $price=$row['base_price']+$row['base_price']*$rowtax['taxp']/100-$row['base_price']*$row['discount']/100;
+
+        }else if ($row['tax']==1 && $row['discount']==0 )
+            {
+                $price=$row['base_price']+$row['base_price']*$rowtax['taxp']/100-$row['base_price']*$rowtax['global_discount']/100;
+            }
+            else if($row['tax']==0 && $row['discount']>0){
+                $firstprice= $price=$row['base_price']+$row['base_price']*$rowtax['taxp']/100;
+                $price=$row['base_price']-$row['base_price']*$row['discount']/100;
+            }
+            else{
+                $price=$row['base_price']-$row['base_price']*$rowtax['global_discount']/100;
+            }
+
+
         ?>
     <tr onclick='trclick(<?php echo $idd ?>)' >
         <td><?php echo $row['name'];   ?></td>
-        <td><?php echo $row['description'];?></td>
-        <td><?php echo $row['base_price'];?></td>
+        <td><?php echo $row['SKU'];?></td>
+        <td><?php if(isset($firstprice)){echo"<strike>$firstprice</strike><br>";} $firstprice= null; echo $price ?></td>
+        <td><?php echo $rowrate['avg'];?></td>
+        <td><?php echo $rowrev['txt'];?></td>
     </tr>
     <?php }?>
     </tbody>
