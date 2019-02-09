@@ -17,7 +17,7 @@
 
         </div>
         <ul class="nav navbar-nav">
-
+            <li class="{{Request::is('/')?'active':null }}"><a href="{{url('/')}}">Welcome</a></li>
         </ul>
 
         <ul class="nav navbar-nav navbar-right">

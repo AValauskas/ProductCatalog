@@ -14,7 +14,6 @@ class UserController extends Controller
 
         $dbc = database();
 
-
         $sql="select * from person where username='$username' and password='$pass'";
         $data = mysqli_query($dbc, $sql);
         $row = mysqli_fetch_assoc($data);
@@ -28,8 +27,8 @@ class UserController extends Controller
             return redirect('/welcome');
         }
         else{
-            $_SESSION["error"]="error";
-            return redirect('/login');
+            $_SESSION["login_error"]="username or password was incorrect";
+            return redirect('/welcome');
 
         }
     }

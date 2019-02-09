@@ -34,6 +34,10 @@ $rowsp=$rowsphere['name'];
             <h2>name</h2> <input type="text" name="name" value="<?php {echo $row["name"];}  ?>">
             <h2>SKU</h2> <input type="text" name="sku" value="<?php {echo $row["SKU"];} ?>" readonly="readonly">
             <h2>price</h2> <input type="text" name="price" value="<?php {echo $row["base_price"];}  ?>">
+            <h2>discount</h2>
+                <input name="discount" type="range" min="0" max="100" value="<?php {echo $row["discount"];}  ?>" id="myRange">
+            <p>Value: <span id="demo"></span></p>
+
             <h2>Description</h2> <textarea style="width: inherit;height: 200px"type="text" name="description" value="" required><?php {echo $row["description"];}  ?></textarea>
             <br><br>
             <select class="btn btn-lg" name="status">
@@ -68,6 +72,15 @@ $rowsp=$rowsphere['name'];
     </div>
 </div>
 <br>
+<script>
+    var slider = document.getElementById("myRange");
+    var output = document.getElementById("demo");
+    output.innerHTML = slider.value;
+
+    slider.oninput = function() {
+        output.innerHTML = this.value;
+    }
+</script>
 </body>
 
 

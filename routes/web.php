@@ -30,7 +30,9 @@ Route::get('/addproduct', function () {
 Route::get('/editProduct', function () {
     return view('editProduct');
 });
-
+Route::get('/productinfo', function () {
+    return view('productinfo');
+});
 
 Route::post('/log', 'UserController@log');
 Route::get('/logout', 'UserController@logout');
@@ -38,3 +40,10 @@ Route::get('/logout', 'UserController@logout');
 Route::get('/productadd', 'ProductController@productadd');
 Route::get('/deleteProduct', 'ProductController@deleteProduct');
 Route::get('/productedit', 'ProductController@productedit');
+Route::get('/productrate', 'ProductController@productrate');
+Route::get('/writereview', 'ProductController@writereview');
+Route::get('/deletefew', 'ProductController@deletefew');
+Route::get('/taxchange', 'ProductController@taxchange');
+Route::get('/taxrate', 'ProductController@taxrate');
+Route::get('/discset', 'ProductController@discset');
+

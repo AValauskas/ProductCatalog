@@ -38,7 +38,7 @@ class ProductController extends Controller
         else {
 
 
-            $sql = "insert into product(name,SKU,base_price,description,status,sphere) values('$name','$sku','$price','$description','$status','$sphere')";
+            $sql = "insert into product(name,SKU,base_price,discount,description,status,sphere) values('$name','$sku','$price','0','$description','$status','$sphere')";
             if (mysqli_query($dbc, $sql)) {
                 return redirect('/welcome');
             }
@@ -65,12 +65,12 @@ public function  productedit(request $request)
     $description=$request->input('description');
     $status=$request->input('status');
     $sphere=$request->input('sphere');
-
+    $discount=$request->input('discount');
 
     if (   $status )
     $dbc = database();
 
-    $sql = "update product set name='$name',base_price='$price',description='$description',status='$status',sphere='$sphere' where SKU='$sku'";
+    $sql = "update product set name='$name',base_price='$price',description='$description',status='$status',sphere='$sphere',discount ='$discount' where SKU='$sku'";
     if(mysqli_query($dbc, $sql))
     {
         $_SESSION['Productupdatet']="Product was succesfully updated";
@@ -79,6 +79,110 @@ public function  productedit(request $request)
 
 
 }
+    public function  productrate(request $request)
+    {
+        $evaluation=$request->input('evaluation');
+        $sku=$request->input('sku');
+        $dbc = database();
+        $sql ="insert into rate (number,fk_ProductSKU) values('$evaluation','$sku')";
+        if (mysqli_query($dbc, $sql)) {
+            $_SESSION['succesfullrate']="Rate was succesfully added";
+            return redirect("/productinfo?proid=" . "$sku");
+        }
+    }
+
+    public function  writereview(request $request)
+    {
+        $review=$request->input('review');
+        $sku=$request->input('sku');
+        $dbc = database();
+        $sql ="insert into review (text,fk_ProductSKU) values('$review','$sku')";
+        if (mysqli_query($dbc, $sql)) {
+            $_SESSION['succesfullrev']="Review was succesfully added";
+            return redirect("/productinfo?proid=" . "$sku");
+        }
+    }
+
+    public function  deletefew(request $request)
+    {
+        $prodtodelete=$request->input('prodtodelete');
+        $dbc = database();
+
+        foreach($prodtodelete as $item){
+
+            $sqldeleterates = "DELETE rate from rate where fk_ProductSKU='$item'";
+            $sqldeletereviews = "DELETE review from review where fk_ProductSKU='$item'";
+            if(mysqli_query($dbc, $sqldeleterates)&&mysqli_query($dbc, $sqldeletereviews)) {
+                $sql = "DELETE product from product where SKU='$item'";
+                if (mysqli_query($dbc, $sql)) {
+                    $_SESSION['Product deleted'] = "Products was succesfully deleted";
+                }
+            }
+            else{$_SESSION['error_deleting']="error";}
+        }
+        return redirect('/welcome');
+    }
+
+    public function  taxchange()
+    {
+        $sku=$_GET['proid'];
+        $dbc = database();
+        $sqlfindbool="select tax from product where SKU ='$sku'";
+        $data = mysqli_query($dbc, $sqlfindbool);
+        $row = mysqli_fetch_assoc($data);
+        $boo=$row['tax'];
+
+        if (  $boo=='1'  ) {
+            $sqltaxt = "update product set tax='0' where SKU='$sku'";
+        }else{
+            $sqltaxt = "update product set tax='1' where SKU='$sku'";
+        }
+
+        if (mysqli_query($dbc, $sqltaxt)) {
+            return redirect('/welcome');
+        }
+    }
+
+
+    public function  taxrate()
+    {
+        $rate=$_GET['value'];
+        $dbc = database();
+        $sqlfind ="select * from money";
+        $data = mysqli_query($dbc, $sqlfind);
+        $row = mysqli_fetch_assoc($data);
+
+        if (isset($row['taxp'])||isset($row['global_discount']))
+        {
+            $sql="update money set taxp='$rate'";
+
+        }else {
+            $sql = "insert into money(taxp) values('$rate')";
+        }
+        mysqli_query($dbc, $sql);
+        return redirect('/welcome');
+    }
+
+    public function  discset()
+    {
+        $dis=$_GET['value'];
+        $dbc = database();
+        $sqlfind ="select * from money";
+        $data = mysqli_query($dbc, $sqlfind);
+        $row = mysqli_fetch_assoc($data);
+
+        if (isset($row['taxp'])||isset($row['global_discount']))
+        {
+            $sql="update money set global_discount='$dis'";
+
+        }else {
+            $sql = "insert into money(global_discount) values('$dis')";
+        }
+        mysqli_query($dbc, $sql);
+        return redirect('/welcome');
+    }
+
+
 
 
 
