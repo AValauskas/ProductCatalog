@@ -26,9 +26,10 @@ $rowtax = mysqli_fetch_assoc($datatax);
 if (isset($_SESSION['userid']))
     {
         ?>
-<a href=../public/addproduct><input type=button class="btn btn-lg" value='Add Product'></a>
+<a href=../public/addproduct><input type=button class="btn btn-success" value='Add Product'></a>
 <br><br>
 <form class="" action="{{URL::to('/deletefew')}}" method="get">
+    <div style="overflow: auto; max-height: 60vh;" class="col-md-12">
 <table class="table table-hover" id="myTable">
     <thead>
     <tr class="header">
@@ -45,7 +46,7 @@ if (isset($_SESSION['userid']))
     </tr>
 
     </thead>
-    <tbody>
+    <tbody >
 <?php
 while($row = mysqli_fetch_array($data)) {
 $idd =$row['SKU'];?>
@@ -65,93 +66,91 @@ $idd =$row['SKU'];?>
 <?php }?>
     </tbody>
 </table>
+    </div>
     <input type="submit" value="Delete">
 </form>
 
 
 
-
+<div class="container">
+    <div class="row">
 <h2>Tax rate</h2>
     <input name="rate" type="range" onclick="Taxset()" min="0" max="100" value="<?php echo $rowtax['taxp'] ?>" id="myRange">
     <p>Value: <span id="demo"></span></p>
-
-
+    </div>
+    <div class="row">
 <h2>Global discount</h2>
 <input name="disc" type="range" onclick="discset()" min="0" max="100" value="<?php echo $rowtax['global_discount'] ?>" id="my2Range">
-<p>Value: <span id="demo2"></span></p>
-
+        <p>Value: <span id="demo2"></span></p>\</div>
+</div>
 
 
 <?php
 }else{
 ?>
 
-<table class="table table-hover" id="myTable">
-    <thead>
-    <tr class="header">
-        <th>image</th>
-        <th>name</th>
-        <th>SKU</th>
-        <th>Price</th>
-        <th>Rate</th>
-        <th>Reviews count</th>
-
-    </tr>
-
-    </thead>
-
-    <tbody>
-    <?php
-    while($row = mysqli_fetch_array($datauser)) {
-    $idd =$row['SKU'];
-
-    $ratesql="select AVG(number) as avg from rate where fk_ProductSKU='$idd'";
-    $ratedata = mysqli_query($dbc, $ratesql);
-    $rowrate = mysqli_fetch_assoc($ratedata);
 
 
-    $revsql="select count(text) as txt from review where fk_ProductSKU='$idd'";
-    $revdata = mysqli_query($dbc, $revsql);
-    $rowrev = mysqli_fetch_assoc($revdata);
+<div class="container" style="top:1000px">
+    <div class="row">
 
 
-    if($row['tax']==1 && $row['discount']>0)
+        <?php
+        while($row = mysqli_fetch_array($datauser)) {
+        $idd =$row['SKU'];
+
+        $ratesql="select AVG(number) as avg from rate where fk_ProductSKU='$idd'";
+        $ratedata = mysqli_query($dbc, $ratesql);
+        $rowrate = mysqli_fetch_assoc($ratedata);
+
+
+        $revsql="select count(text) as txt from review where fk_ProductSKU='$idd'";
+        $revdata = mysqli_query($dbc, $revsql);
+        $rowrev = mysqli_fetch_assoc($revdata);
+
+
+        if($row['tax']==1 && $row['discount']>0)
         {
             //yra pvm
             $firstprice= $price=$row['base_price']+$row['base_price']*$rowtax['taxp']/100;
             $price=$row['base_price']+$row['base_price']*$rowtax['taxp']/100-$row['base_price']*$row['discount']/100;
 
         }else if ($row['tax']==1 && $row['discount']==0 )
-            {
-                $price=$row['base_price']+$row['base_price']*$rowtax['taxp']/100-$row['base_price']*$rowtax['global_discount']/100;
-            }
-            else if($row['tax']==0 && $row['discount']>0){
-                $firstprice= $price=$row['base_price']+$row['base_price']*$rowtax['taxp']/100;
-                $price=$row['base_price']-$row['base_price']*$row['discount']/100;
-            }
-            else{
-                $price=$row['base_price']-$row['base_price']*$rowtax['global_discount']/100;
-            }
-
-
+        {
+            $price=$row['base_price']+$row['base_price']*$rowtax['taxp']/100-$row['base_price']*$rowtax['global_discount']/100;
+        }
+        else if($row['tax']==0 && $row['discount']>0){
+            $firstprice= $price=$row['base_price']+$row['base_price']*$rowtax['taxp']/100;
+            $price=$row['base_price']-$row['base_price']*$row['discount']/100;
+        }
+        else{
+            $price=$row['base_price']-$row['base_price']*$rowtax['global_discount']/100;
+        }
         ?>
-    <tr onclick='trclick(<?php echo $idd ?>)' >
-        <td><img src="../public/images/<?php echo $row['image']?>" width="100" height="100"></td>
-        <td><?php echo $row['name'];   ?></td>
-        <td><?php echo $row['SKU'];?></td>
-        <td><?php if(isset($firstprice)){echo"<strike>$firstprice</strike><br>";} $firstprice= null; echo $price ?></td>
-        <td><?php echo $rowrate['avg'];?></td>
-        <td><?php echo $rowrev['txt'];?></td>
-    </tr>
-    <?php }?>
-    </tbody>
-</table>
+        <div class="col-md-4 col-sm-6 col-xs-12" style="border-style: solid; border-width: 1px; height: 200px " onclick='divclick(<?php echo $idd ?>)'>
+            <div class="col-sm-6">
+            <p><?php echo $row['name'];?></p>
+            <img src="../public/images/<?php echo $row['image']?>" width="150" height="150">
+            </div>
+            <div class="col-sm-6">
+                <p>SKU: <?php echo $row['SKU'];?></p>
+                <p>Price <?php if(isset($firstprice)){echo"<strike>$firstprice</strike> &#8364;<br> ";} $firstprice= null; echo "$price &#8364"; ?></p>
+                <p>Rate <?php echo bcdiv($rowrate['avg'],1,2);?></p>
+                <p>number of reviews <?php echo  $rowrev['txt'];?></p>
+            </div>
+
+        </div>
+            <?php }?>
 
 
+    </div>
+</div>
 <?php }?>
 
 
+
 <script>
+
     var slider = document.getElementById("myRange");
     var output = document.getElementById("demo");
     output.innerHTML = slider.value;
@@ -170,10 +169,12 @@ $idd =$row['SKU'];?>
 
 
 
-    function trclick(x){
+    function divclick(x){
         window.location.href = "../public/productinfo?proid="+x;
     };
-
+    function trclick(x){
+        window.location.href = "../public/editProduct?id="+x;
+    };
     function Taxchange(x) {
             window.location.href = "../public/taxchange?proid="+x;
     };
@@ -183,6 +184,11 @@ $idd =$row['SKU'];?>
     function discset(){
         window.location.href = "../public/discset?value="+slider2.value;
     };
+
+
+
+
+
 
 
 </script>
