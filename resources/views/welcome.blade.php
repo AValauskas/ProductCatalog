@@ -32,7 +32,8 @@ if (isset($_SESSION['userid']))
 <table class="table table-hover" id="myTable">
     <thead>
     <tr class="header">
-        <th>Check</th>
+        <th>mark to delete</th>
+        <th>photo</th>
         <th>Name</th>
         <th>SKU</th>
         <th>description</th>
@@ -51,6 +52,7 @@ $idd =$row['SKU'];?>
 
 <tr>
     <td> <input type="checkbox" name="prodtodelete[]" value="<?php echo "$idd" ?>"></td>
+    <td><img src="../public/images/<?php echo $row['image']?>" width="100" height="100"></td>
     <td><?php echo $row['name'];  ?></td>
     <td><?php echo "$idd"; ?></td>
     <td><?php echo $row['description'];?></td>
@@ -87,6 +89,7 @@ $idd =$row['SKU'];?>
 <table class="table table-hover" id="myTable">
     <thead>
     <tr class="header">
+        <th>image</th>
         <th>name</th>
         <th>SKU</th>
         <th>Price</th>
@@ -133,6 +136,7 @@ $idd =$row['SKU'];?>
 
         ?>
     <tr onclick='trclick(<?php echo $idd ?>)' >
+        <td><img src="../public/images/<?php echo $row['image']?>" width="100" height="100"></td>
         <td><?php echo $row['name'];   ?></td>
         <td><?php echo $row['SKU'];?></td>
         <td><?php if(isset($firstprice)){echo"<strike>$firstprice</strike><br>";} $firstprice= null; echo $price ?></td>

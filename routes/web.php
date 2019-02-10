@@ -37,7 +37,7 @@ Route::get('/productinfo', function () {
 Route::post('/log', 'UserController@log');
 Route::get('/logout', 'UserController@logout');
 
-Route::get('/productadd', 'ProductController@productadd');
+Route::post('/productadd', 'ProductController@productadd');
 Route::get('/deleteProduct', 'ProductController@deleteProduct');
 Route::get('/productedit', 'ProductController@productedit');
 Route::get('/productrate', 'ProductController@productrate');
@@ -47,3 +47,4 @@ Route::get('/taxchange', 'ProductController@taxchange');
 Route::get('/taxrate', 'ProductController@taxrate');
 Route::get('/discset', 'ProductController@discset');
 
+Route::post('/revsdisplay', 'ProductController@revsdisplay');

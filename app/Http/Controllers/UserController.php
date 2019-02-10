@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 class UserController extends Controller
 {
     //
-    public function log(request $request)      //paima prisijungimo duomenis is db
+    public function log(request $request)
     {
         $username=$request->input('username');
         $pass=$request->input('password');

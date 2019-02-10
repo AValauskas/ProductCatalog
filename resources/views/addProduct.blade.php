@@ -8,7 +8,11 @@
 <div class="container">
     <div class="col-md-6 col-md-offset-3">
         <h3>Product add</h3><br>
-        <form class="" action="{{URL::to('/productadd')}}" method="get">
+
+
+
+
+        <form class="" action="{{URL::to('/productadd')}}" method="post" enctype="multipart/form-data">
             <h2>name</h2> <input type="text" required name="name" value="<?php if(isset($_SESSION['name'])){echo $_SESSION["name"]; $_SESSION["name"]=null;}  ?> ">
             <h2>SKU</h2> <input type="text" required name="sku" value="<?php if(isset($_SESSION['sku'])){echo $_SESSION["sku"]; $_SESSION["sku"]=null;}  ?>">
             <h2>price</h2> <input type="text" required name="price" value="<?php if(isset($_SESSION['price'])){echo $_SESSION["price"]; $_SESSION["price"]=null;}  ?>">
@@ -26,8 +30,8 @@
                 <option value="2">studies</option>
                 <option value="3">freetime</option>
             </select >
-
             <input type="hidden" name="_token" value="{{csrf_token()}}">
+            <h2>Photo</h2> <input type="file" name="image" id="image" required/><br>
             <br><br>
             <button type=submit name="button">Submit</button>
             <br>

@@ -9,7 +9,8 @@ $dbc = database();
       $row = mysqli_fetch_assoc($data);
         $name=$row['name'];
 
-
+$reviewssql="select * from review where fk_ProductSKU=$sku ";
+$datareviews = mysqli_query($dbc, $reviewssql);
 ?>
 <html>
 
@@ -18,6 +19,8 @@ $dbc = database();
 
 
 <body>
+
+<td><img src="../public/images/<?php echo $row['image']?>" width="200" height="200"></td>
 <br><br>
 <h2><?php echo "$name" ?></h2>
 <br><br>
@@ -33,7 +36,7 @@ $dbc = database();
         <option value="5">5</option>
     </select >
     <br><br>
-    <input type="hidden" name="sku" value="{{$sku}}">
+    <input type="hidden" id="sku" name="sku" value="{{$sku}}">
     <input type="hidden" name="_token" value="{{csrf_token()}}">
     <br><br>
     <button type=submit name="button">Submit</button>
@@ -50,26 +53,71 @@ $dbc = database();
 </form>
 
 <br><br>
-<h2>Add review</h2>
-<form class="" action="{{URL::to('/writereview')}}" method="get">
 
-    <textarea style="width: inherit;height: 200px"type="text" name="review" value="" required></textarea>
+<div>
+    <input type="hidden" id="_token"  name="_token" value="{{csrf_token()}}">
+    <textarea style="width: inherit;height: 200px"type="text" id="review" name="review" value="" required></textarea>
     <br><br>
-    <input type="hidden" name="sku" value="{{$sku}}">
-    <input type="hidden" name="_token" value="{{csrf_token()}}">
-    <br><br>
-    <button type=submit name="button">Submit</button>
-    <br>
-    <br>
-    <?php
-    if (isset($_SESSION['succesfullrev']))
+    <button id="show-rev" class="btn-rev">Add review</button>
+</div>
+
+<table>
+
+<h2>Reviews</h2>
+<tbody id="list-item">
+<?php
+while($rowrevs = mysqli_fetch_array($datareviews)) {
+?>
+<tr>
+    <td><?php echo $rowrevs['text'];?></td>
+</tr>
+<?php }?>
+</tbody>
+</table>
+
+
+<script>
+    $('#show-rev').click(function()
     {
-        $msg=$_SESSION['succesfullrev'];
-        echo "$msg";
-        $_SESSION['succesfullrev']=null;
+        console.log('buttn clicked');
+        showreviews();
+
+    });
+    
+    function showreviews() {
+        var sku = document.getElementById('sku').value
+        var review = document.getElementById('review').value
+        var token = document.getElementById('_token').value
+        console.log(sku);
+
+        $.ajax({
+            type: "post",
+            url: "<?= URL::to('/revsdisplay')?>",
+            dataType: "json",
+            data:{
+                'sku': sku,
+                'review': review,
+                '_token' : token
+            },
+
+            beforesend: function () {
+
+            },
+            success: function (data) {
+                if (data.status == 'success') {
+                $('#list-item').before(
+                    '<tr>' +
+                    '<td>' + data.review + '</td>' +
+                    '</tr>'
+                )
+            }else{alert('Error')}
+            }
+        });
+
     }
-    ?>
-</form>
+
+
+</script>
 
 </body>
 

@@ -3,12 +3,19 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 
 class ProductController extends Controller
 {
 
     public function productadd(request $request)
     {
+        $image=$request->file('image');
+
+        $input=$image->getClientOriginalName();
+        $destinationPath=public_path('/images');
+        $image->move($destinationPath, $input);
+
         $name=$request->input('name');
         $sku=$request->input('sku');
         $price=$request->input('price');
@@ -38,7 +45,7 @@ class ProductController extends Controller
         else {
 
 
-            $sql = "insert into product(name,SKU,base_price,discount,description,status,sphere) values('$name','$sku','$price','0','$description','$status','$sphere')";
+            $sql = "insert into product(name,SKU,base_price,discount,image,description,status,sphere) values('$name','$sku','$price','0','$input','$description','$status','$sphere')";
             if (mysqli_query($dbc, $sql)) {
                 return redirect('/welcome');
             }
@@ -182,7 +189,21 @@ public function  productedit(request $request)
         return redirect('/welcome');
     }
 
+    public function revsdisplay()
+    {
+        $sku = $_POST['sku'];
+        $review=$_POST['review'];
+        $dbc = database();
+        $sql ="insert into review (text,fk_ProductSKU) values('$review','$sku')";
 
+        if(mysqli_query($dbc, $sql)) {
+            return response()->json([
+                'status' => 'success',
+                'sku' => $sku,
+                'review' => $review
+            ]);
+        }
+    }
 
 
 
