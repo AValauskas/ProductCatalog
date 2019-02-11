@@ -52,7 +52,7 @@ if (isset($_SESSION['userid']))
     {
         ?>
 
-
+<!-- add popup form -->
 <button class="btn btn-success" onclick="openForm()">Add product</button>
 
 <div class="form-popup" id="myForm">
@@ -66,9 +66,8 @@ if (isset($_SESSION['userid']))
         <div class="form-group">
             <label for="price">Price </label><br><input type="text" required name="price" id="price" value="<?php if(isset($_SESSION['price'])){echo $_SESSION["price"]; $_SESSION["price"]=null;}  ?>">
         </div>
-
         <div class="form-group">
-            <label for="description">Description </label><br> <textarea style="width: inherit;height: 200px"type="text" name="description" value="<?php if(isset($_SESSION['description'])){echo $_SESSION["description"]; $_SESSION["description"]=null;}  ?>" required></textarea>
+            <label for="description">Description </label><br> <textarea style="width: inherit;height: 200px"type="text" name="description" id="description" value="<?php if(isset($_SESSION['description'])){echo $_SESSION["description"]; $_SESSION["description"]=null;}  ?>" required></textarea>
         </div>
             <br><br>
         <div class="form-group">
@@ -87,7 +86,7 @@ if (isset($_SESSION['userid']))
             <option value="3">freetime</option>
         </select >
         </div>
-        <input type="hidden" name="_token" value="{{csrf_token()}}">
+        <input type="hidden" name="_token" id="_token" value="{{csrf_token()}}">
         <div class="form-group">
             <label for="photo">Photo </label><br><input type="file" name="image" id="image" required/><br>
         </div>
@@ -107,8 +106,58 @@ if (isset($_SESSION['userid']))
     </form>
 </div>
 
+<!-- edit popup form -->
+<div class="form-popup" id="myForm2">
+    <form class="" action="{{URL::to('/productedit')}}" method="get" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="name">Name </label><br><input type="text" required name="name" id="name2" value="">
+        </div>
+        <div class="form-group">
+            <label for="sku">SKU </label><br> <input type="text" required name="sku" id="sku2" value="">
+        </div>
+        <div class="form-group">
+            <label for="price">Price </label><br><input type="text" required name="price" id="price2" value="">
+        </div>
+        <div class="form-group">
+            <label for="discount">Discount </label><br> <input name="discount" type="range" min="0" max="100" value="" id="myRange3">
+            <p>Value: <span id="demo3"></span></p>
+        </div>
 
-
+        <div class="form-group">
+            <label for="description">Description </label><br> <textarea style="width: inherit;height: 200px"type="text" name="description" id="description2" value="" required></textarea>
+        </div>
+        <br>
+        <div class="form-group">
+            <select class="btn btn-lg" name="status" id="toshow" required>
+                <option value="">Choose status</option>
+                <option value="1">enabled</option>
+                <option value="2">disabled</option>
+            </select >
+        </div>
+        <br>
+        <div class="form-group">
+            <select class="btn btn-lg" name="sphere" id="sphere2" required>
+                <option value="">choose sphere</option>
+                <option value="1">sport</option>
+                <option value="2">studies</option>
+                <option value="3">freetime</option>
+            </select >
+        </div>
+        <input type="hidden" name="_token" id="_token" value="{{csrf_token()}}">
+        <button  type=submit class="btn2">Submit</button>
+        <br><br>
+        <button type="button" class="btn btn-danger" onclick="closeForm2()">Close</button>
+        <br>
+        <?php
+        if (isset($_SESSION['error']))
+        {
+            $msg=$_SESSION['error'];
+            echo "$msg";
+            $_SESSION['error']=null;
+        }
+        ?>
+    </form>
+</div>
 <br><br>
 <form class="" action="{{URL::to('/deletefew')}}" method="get">
     <div style="overflow: auto; max-height: 60vh;" class="col-md-12">
@@ -141,7 +190,7 @@ $idd =$row['SKU'];?>
     <td><?php echo $row['description'];?></td>
     <td><?php echo $row['base_price'];?></td>
     <td><?php echo $row['discount'];?></td>
-    <td> <?php echo" <a href=../public/editProduct?id=",urlencode($idd),"><input type=button class='btn btn-primar' id='$idd' value='Edit' ></a> " ?></td>
+    <td><input type=button class='btn btn-primar' id='<?php echo $idd ?>' value='Edit' onclick="EditPop(<?php echo $idd ?>)" ></td>
     <td> <?php echo" <a href=../public/deleteProduct?id=",urlencode($idd),"><input type=button class='btn btn-danger' id='$idd' value='Delete' ></a> " ?></td>
     <td> <input type="checkbox" onclick="Taxchange(<?php echo $idd ?>)" <?php if( $row['tax'] == '1'){echo "checked";} ?>  > </td>
 </tr>
@@ -162,7 +211,7 @@ $idd =$row['SKU'];?>
     <div class="row">
 <h2>Global discount</h2>
 <input name="disc" type="range" onclick="discset()" min="0" max="100" value="<?php echo $rowtax['global_discount'] ?>" id="my2Range">
-        <p>Value: <span id="demo2"></span></p>\</div>
+        <p>Value: <span id="demo2"></span></p></div>
 </div>
 
 
@@ -250,6 +299,7 @@ $idd =$row['SKU'];?>
 
 
 
+
     function divclick(x){
         window.location.href = "../public/productinfo?proid="+x;
     };
@@ -267,13 +317,63 @@ $idd =$row['SKU'];?>
 
 
     function openForm() {
+        closeForm2();
         document.getElementById("myForm").style.display = "block";
     }
 
     function closeForm() {
         document.getElementById("myForm").style.display = "none";
     }
+    function openForm2() {
+        document.getElementById("myForm2").style.display = "block";
+    }
 
+    function closeForm2() {
+        document.getElementById("myForm2").style.display = "none";
+    }
+
+
+
+
+
+    function EditPop(x) {
+        closeForm();
+        var token = document.getElementById('_token').value
+        console.log(x);
+        $.ajax({
+            type: "post",
+            url: "<?= URL::to('/prodinfo')?>",
+            dataType: "json",
+            data:{
+                'sku': x,
+                '_token' : token
+            },
+            beforesend: function () {
+            },
+            success: function (data) {
+                if (data.status == 'success') {
+                    console.log(data.name);
+                    $('#name2').val(data.name);
+                    $('#sku2').val(data.sku);
+                    $('#price2').val(data.price);
+                    $('#description2').val(data.description);
+                    $('#myRange3').val(data.discount);
+                    $('#sphere2').val(data.sphere);
+                    $("#toshow").val(data.show);
+                    var slider3 = document.getElementById("myRange3");
+                    var output3 = document.getElementById("demo3");
+                    output3.innerHTML = slider3.value;
+                    console.log(slider3.value);
+                    slider3.oninput = function() {
+                        output3.innerHTML = this.value;
+                    }
+                    openForm2();
+                }else{alert('Error')}
+            }
+
+        });
+
+    }
 
 
 

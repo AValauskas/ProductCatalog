@@ -48,3 +48,5 @@ Route::get('/taxrate', 'ProductController@taxrate');
 Route::get('/discset', 'ProductController@discset');
 
 Route::post('/revsdisplay', 'ProductController@revsdisplay');
+Route::post('/prodinfo', 'ProductController@prodinfo');
+

@@ -209,6 +209,38 @@ public function  productedit(request $request)
         }
     }
 
+    public function prodinfo()
+    {
+        $sku = $_POST['sku'];
+
+
+
+        $dbc = database();
+        $sql="select * from product where SKU='$sku'";
+        $data=mysqli_query($dbc, $sql);
+        if ( isset($data)){
+            $row = mysqli_fetch_assoc($data);
+            return response()->json([
+                'status' => 'success',
+                'name' => $row['name'],
+                'sku' => $row['SKU'],
+                'price' => $row['base_price'],
+                'description' => $row['description'],
+                'discount' => $row['discount'],
+                'show' => $row['status'],
+                'sphere' => $row['sphere'],
+            ]);
+
+        }
+
+
+
+
+
+    }
+
+
+
 
 
 }
