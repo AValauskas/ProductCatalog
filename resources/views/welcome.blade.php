@@ -4,7 +4,32 @@
 
 
 <body>
+<head>
+    <style>
+        .form-popup {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            right: 15px;
+            border: 3px solid #f1f1f1;
+            z-index: 9;
+            background-color: #98e1b7;
+        }
 
+        .btn2{
+            background-color: green;
+        }
+
+    </style>
+<?php
+    if(isset($_SESSION["error"])){?>
+     <style>
+         .form-popup {display: block;}
+     </style>
+<?php }?>
+
+
+</head>
 <?php
 if (isset( $_SESSION["login_error"]))
     {
@@ -26,7 +51,64 @@ $rowtax = mysqli_fetch_assoc($datatax);
 if (isset($_SESSION['userid']))
     {
         ?>
-<a href=../public/addproduct><input type=button class="btn btn-success" value='Add Product'></a>
+
+
+<button class="btn btn-success" onclick="openForm()">Add product</button>
+
+<div class="form-popup" id="myForm">
+    <form class="" action="{{URL::to('/productadd')}}" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+        <label for="name">Name </label><br><input type="text" required name="name" id="name" value="<?php if(isset($_SESSION['name'])){echo $_SESSION["name"]; $_SESSION["name"]=null;}  ?> ">
+        </div>
+        <div class="form-group">
+            <label for="sku">SKU </label><br> <input type="text" required name="sku" id="sku" value="<?php if(isset($_SESSION['sku'])){echo $_SESSION["sku"]; $_SESSION["sku"]=null;}  ?>">
+        </div>
+        <div class="form-group">
+            <label for="price">Price </label><br><input type="text" required name="price" id="price" value="<?php if(isset($_SESSION['price'])){echo $_SESSION["price"]; $_SESSION["price"]=null;}  ?>">
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description </label><br> <textarea style="width: inherit;height: 200px"type="text" name="description" value="<?php if(isset($_SESSION['description'])){echo $_SESSION["description"]; $_SESSION["description"]=null;}  ?>" required></textarea>
+        </div>
+            <br><br>
+        <div class="form-group">
+        <select class="btn btn-lg" name="status" required>
+            <option value="">Choose status</option>
+            <option value="1">enabled</option>
+            <option value="2">disabled</option>
+        </select >
+        </div>
+        <br><br>
+        <div class="form-group">
+        <select class="btn btn-lg" name="sphere" required>
+            <option value="">choose sphere</option>
+            <option value="1">sport</option>
+            <option value="2">studies</option>
+            <option value="3">freetime</option>
+        </select >
+        </div>
+        <input type="hidden" name="_token" value="{{csrf_token()}}">
+        <div class="form-group">
+            <label for="photo">Photo </label><br><input type="file" name="image" id="image" required/><br>
+        </div>
+        <br>
+        <button  type=submit class="btn2">Submit</button>
+        <br><br>
+        <button type="button" class="btn btn-danger" onclick="closeForm()">Close</button>
+        <br>
+        <?php
+        if (isset($_SESSION['error']))
+        {
+            $msg=$_SESSION['error'];
+            echo "$msg";
+            $_SESSION['error']=null;
+        }
+        ?>
+    </form>
+</div>
+
+
+
 <br><br>
 <form class="" action="{{URL::to('/deletefew')}}" method="get">
     <div style="overflow: auto; max-height: 60vh;" class="col-md-12">
@@ -59,17 +141,16 @@ $idd =$row['SKU'];?>
     <td><?php echo $row['description'];?></td>
     <td><?php echo $row['base_price'];?></td>
     <td><?php echo $row['discount'];?></td>
-    <td> <?php echo" <a href=../public/editProduct?id=",urlencode($idd),"><input type=button class='btn btn-lg' id='$idd' value='Edit' ></a> " ?></td>
-    <td> <?php echo" <a href=../public/deleteProduct?id=",urlencode($idd),"><input type=button class='btn btn-lg' id='$idd' value='Delete' ></a> " ?></td>
+    <td> <?php echo" <a href=../public/editProduct?id=",urlencode($idd),"><input type=button class='btn btn-primar' id='$idd' value='Edit' ></a> " ?></td>
+    <td> <?php echo" <a href=../public/deleteProduct?id=",urlencode($idd),"><input type=button class='btn btn-danger' id='$idd' value='Delete' ></a> " ?></td>
     <td> <input type="checkbox" onclick="Taxchange(<?php echo $idd ?>)" <?php if( $row['tax'] == '1'){echo "checked";} ?>  > </td>
 </tr>
 <?php }?>
     </tbody>
 </table>
     </div>
-    <input type="submit" value="Delete">
+    <input type="submit" value="Delete" class="btn btn-danger">
 </form>
-
 
 
 <div class="container">
@@ -172,9 +253,8 @@ $idd =$row['SKU'];?>
     function divclick(x){
         window.location.href = "../public/productinfo?proid="+x;
     };
-    function trclick(x){
-        window.location.href = "../public/editProduct?id="+x;
-    };
+
+
     function Taxchange(x) {
             window.location.href = "../public/taxchange?proid="+x;
     };
@@ -186,7 +266,13 @@ $idd =$row['SKU'];?>
     };
 
 
+    function openForm() {
+        document.getElementById("myForm").style.display = "block";
+    }
 
+    function closeForm() {
+        document.getElementById("myForm").style.display = "none";
+    }
 
 
 

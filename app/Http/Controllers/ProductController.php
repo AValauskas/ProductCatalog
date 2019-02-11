@@ -40,7 +40,7 @@ class ProductController extends Controller
             $_SESSION["sphere"]=$sphere;
 
             $_SESSION["error"]="SKU already exist";
-            return redirect('/addproduct');
+            return redirect('/welcome');
         }
         else {
 
@@ -113,6 +113,10 @@ public function  productedit(request $request)
     public function  deletefew(request $request)
     {
         $prodtodelete=$request->input('prodtodelete');
+        if($prodtodelete==null)
+        {
+            return redirect('/welcome');
+        }
         $dbc = database();
 
         foreach($prodtodelete as $item){
