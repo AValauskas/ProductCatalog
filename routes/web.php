@@ -22,14 +22,6 @@ Route::get('/welcome', function () {
 Route::get('/login', function () {
     return view('login');
 });
-
-Route::get('/addproduct', function () {
-    return view('addProduct');
-});
-
-Route::get('/editProduct', function () {
-    return view('editProduct');
-});
 Route::get('/productinfo', function () {
     return view('productinfo');
 });

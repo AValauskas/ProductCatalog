@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -14,22 +17,30 @@ class UserController extends Controller
 
         $dbc = database();
 
-        $sql="select * from person where username='$username' and password='$pass'";
-        $data = mysqli_query($dbc, $sql);
-        $row = mysqli_fetch_assoc($data);
+        //$sql="select * from person where username='$username' and password='$pass'";
+      //  $data = mysqli_query($dbc, $sql);
 
-        if (isset($row['username'])  )
-        {
+        $data=DB::table('person')
+            ->where('username','=','admin')
+            ->orWhere('password','=','admin')
+            ->get();
 
-            $_SESSION["username"] = $username;
-            $id = $row['id'];
-            $_SESSION["userid"] = $row['id'];
-            return redirect('/welcome');
-        }
-        else{
-            $_SESSION["login_error"]="username or password was incorrect";
-            return redirect('/welcome');
 
+        foreach($data as $one){
+
+            if (isset($one->username)  )
+            {
+
+                $_SESSION["username"] = $username;
+                $id = $one->id;
+                $_SESSION["userid"] = $one->id;;
+                return redirect('/welcome');
+            }
+            else{
+                $_SESSION["login_error"]="username or password was incorrect";
+                return redirect('/welcome');
+
+            }
         }
     }
 
@@ -39,13 +50,5 @@ class UserController extends Controller
         $_SESSION["userid"]=null;
         return redirect('/welcome');
     }
-
-    public function continueas(request $request)
-    {
-        $_SESSION["username"]=null;
-        $_SESSION["userid"]=null;
-        return redirect('/welcome');
-    }
-
 
 }

@@ -24,7 +24,7 @@
 <?php
     if(isset($_SESSION["error"])){?>
      <style>
-         .form-popup {display: block;}
+       #myForm{display: block;}
      </style>
 <?php }?>
 
@@ -67,7 +67,7 @@ if (isset($_SESSION['userid']))
             <label for="price">Price </label><br><input type="text" required name="price" id="price" value="<?php if(isset($_SESSION['price'])){echo $_SESSION["price"]; $_SESSION["price"]=null;}  ?>">
         </div>
         <div class="form-group">
-            <label for="description">Description </label><br> <textarea style="width: inherit;height: 200px"type="text" name="description" id="description" value="<?php if(isset($_SESSION['description'])){echo $_SESSION["description"]; $_SESSION["description"]=null;}  ?>" required></textarea>
+            <label for="description">Description </label><br> <textarea style="width: inherit;height: 200px"type="text" name="description" id="description" value="<?php if(isset($_SESSION['description'])){echo $_SESSION["description"]; $_SESSION["description"]=null;}  ?>" required><?php if(isset($_SESSION['description'])){echo $_SESSION["description"]; $_SESSION["description"]=null;}  ?></textarea>
         </div>
             <br><br>
         <div class="form-group">
@@ -199,6 +199,14 @@ $idd =$row['SKU'];?>
 </table>
     </div>
     <input type="submit" value="Delete" class="btn btn-danger">
+    <br>
+    <?php if(isset( $_SESSION['Product_deleted']))
+    {
+     echo  $_SESSION['Product_deleted'];
+      $_SESSION['Product_deleted']=null;
+    }
+    ?>
+
 </form>
 
 
@@ -218,9 +226,6 @@ $idd =$row['SKU'];?>
 <?php
 }else{
 ?>
-
-
-
 <div class="container" style="top:1000px">
     <div class="row">
 
@@ -297,9 +302,7 @@ $idd =$row['SKU'];?>
         output2.innerHTML = this.value;
     }
 
-
-
-
+    
     function divclick(x){
         window.location.href = "../public/productinfo?proid="+x;
     };
@@ -331,9 +334,6 @@ $idd =$row['SKU'];?>
     function closeForm2() {
         document.getElementById("myForm2").style.display = "none";
     }
-
-
-
 
 
     function EditPop(x) {
@@ -372,11 +372,7 @@ $idd =$row['SKU'];?>
             }
 
         });
-
     }
-
-
-
 </script>
 </body>
 

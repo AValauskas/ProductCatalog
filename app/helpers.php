@@ -10,9 +10,3 @@ function database()
     }
     return $dbc;
 }
-
-function inisession()
-{
-    $_SESSION['id']=null;
-    $_SESSION['username']=null;
-}

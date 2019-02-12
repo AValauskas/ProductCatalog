@@ -31,7 +31,7 @@
                     <input type="text" placeholder="Username" name="username">
                     <input type="password" placeholder="Password" name="password">
                     <input type="hidden" name="_token" value="{{csrf_token()}}">
-                    <button type=submit name="button">Submit</button>
+                    <button type=submit name="button"  value="Login">Login</button>
                 </form>
             </div>
             <?php }

@@ -17,7 +17,6 @@ $datatax = mysqli_query($dbc, $sqltax);
 $rowtax = mysqli_fetch_assoc($datatax);
 
 
-
 if($row['tax']==1 && $row['discount']>0)
 {
     //yra pvm
@@ -92,7 +91,7 @@ $rowrate = mysqli_fetch_assoc($ratedata);
     <input type="hidden" id="sku" name="sku" value="{{$sku}}">
     <input type="hidden" name="_token" value="{{csrf_token()}}">
     <br><br>
-    <button type=submit name="button">Submit</button>
+    <button type=submit name="button" value="Register">Submit</button>
     <br>
     <br>
     <?php
