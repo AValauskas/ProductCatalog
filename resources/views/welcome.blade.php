@@ -38,15 +38,19 @@ if (isset( $_SESSION["login_error"]))
 
     }
 $dbc = database();
-$sqladmin="select * from product";
-$sqluser="select * from product where status='1'";
-$data = mysqli_query($dbc, $sqladmin);
-$datauser =mysqli_query($dbc, $sqluser);
+
+$dataadmin=DB::table('product')
+    ->get();
 
 
-$sqltax="select * from money";
-$datatax = mysqli_query($dbc, $sqltax);
-$rowtax = mysqli_fetch_assoc($datatax);
+$datauser =DB::table('product')
+    ->where('status','=',1)
+    ->get();
+
+
+$datatax = DB::table('money')
+    ->first();
+
 
 if (isset($_SESSION['userid']))
     {
@@ -179,20 +183,20 @@ if (isset($_SESSION['userid']))
     </thead>
     <tbody >
 <?php
-while($row = mysqli_fetch_array($data)) {
-$idd =$row['SKU'];?>
+foreach ($dataadmin as $datas) {
+$idd =$datas->SKU;?>
 
 <tr>
     <td> <input type="checkbox" name="prodtodelete[]" value="<?php echo "$idd" ?>"></td>
-    <td><img src="../public/images/<?php echo $row['image']?>" width="100" height="100"></td>
-    <td><?php echo $row['name'];  ?></td>
+    <td><img src="../public/images/<?php echo $datas->image?>" width="100" height="100"></td>
+    <td><?php echo $datas->name;  ?></td>
     <td><?php echo "$idd"; ?></td>
-    <td><?php echo $row['description'];?></td>
-    <td><?php echo $row['base_price'];?></td>
-    <td><?php echo $row['discount'];?></td>
+    <td><?php echo $datas->description;?></td>
+    <td><?php echo $datas->base_price;?></td>
+    <td><?php echo $datas->discount;?></td>
     <td><input type=button class='btn btn-primar' id='<?php echo $idd ?>' value='Edit' onclick="EditPop(<?php echo $idd ?>)" ></td>
     <td> <?php echo" <a href=../public/deleteProduct?id=",urlencode($idd),"><input type=button class='btn btn-danger' id='$idd' value='Delete' ></a> " ?></td>
-    <td> <input type="checkbox" onclick="Taxchange(<?php echo $idd ?>)" <?php if( $row['tax'] == '1'){echo "checked";} ?>  > </td>
+    <td> <input type="checkbox" onclick="Taxchange(<?php echo $idd ?>)" <?php if( $datas->tax == '1'){echo "checked";} ?>  > </td>
 </tr>
 <?php }?>
     </tbody>
@@ -213,12 +217,12 @@ $idd =$row['SKU'];?>
 <div class="container">
     <div class="row">
 <h2>Tax rate</h2>
-    <input name="rate" type="range" onclick="Taxset()" min="0" max="100" value="<?php echo $rowtax['taxp'] ?>" id="myRange">
+    <input name="rate" type="range" onclick="Taxset()" min="0" max="100" value="<?php echo $datatax->taxp ?>" id="myRange">
     <p>Value: <span id="demo"></span></p>
     </div>
     <div class="row">
 <h2>Global discount</h2>
-<input name="disc" type="range" onclick="discset()" min="0" max="100" value="<?php echo $rowtax['global_discount'] ?>" id="my2Range">
+<input name="disc" type="range" onclick="discset()" min="0" max="100" value="<?php echo $datatax->global_discount?>" id="my2Range">
         <p>Value: <span id="demo2"></span></p></div>
 </div>
 
@@ -231,8 +235,8 @@ $idd =$row['SKU'];?>
 
 
         <?php
-        while($row = mysqli_fetch_array($datauser)) {
-        $idd =$row['SKU'];
+        foreach (@$datauser as $datas) {
+        $idd =$datas->SKU;
 
         $ratesql="select AVG(number) as avg from rate where fk_ProductSKU='$idd'";
         $ratedata = mysqli_query($dbc, $ratesql);
@@ -244,31 +248,31 @@ $idd =$row['SKU'];?>
         $rowrev = mysqli_fetch_assoc($revdata);
 
 
-        if($row['tax']==1 && $row['discount']>0)
+        if($datas->tax==1 && $datas->discount>0)
         {
             //yra pvm
-            $firstprice= $price=$row['base_price']+$row['base_price']*$rowtax['taxp']/100;
-            $price=$row['base_price']+$row['base_price']*$rowtax['taxp']/100-$row['base_price']*$row['discount']/100;
+            $firstprice= $price=$datas->base_price+$datas->base_price*$datatax->taxp/100;
+            $price=$datas->base_price+$datas->base_price*$datatax->taxp/100-$datas->base_price*$datas->discount/100;
 
-        }else if ($row['tax']==1 && $row['discount']==0 )
+        }else if ($datas->tax==1 && $datas->discount==0 )
         {
-            $price=$row['base_price']+$row['base_price']*$rowtax['taxp']/100-$row['base_price']*$rowtax['global_discount']/100;
+            $price=$datas->base_price+$datas->base_price*$datatax->taxp/100-$datas->base_price*$datatax->global_discount/100;
         }
-        else if($row['tax']==0 && $row['discount']>0){
-            $firstprice= $price=$row['base_price']+$row['base_price']*$rowtax['taxp']/100;
-            $price=$row['base_price']-$row['base_price']*$row['discount']/100;
+        else if($datas->tax==0 && $datas->discount>0){
+            $firstprice= $price=$datas->base_price+$datas->base_price*$datatax->taxp/100;
+            $price=$datas->base_price-$datas->base_price*$datas->discount/100;
         }
         else{
-            $price=$row['base_price']-$row['base_price']*$rowtax['global_discount']/100;
+            $price=$datas->base_price-$datas->base_price*$datatax->global_discount/100;
         }
         ?>
         <div class="col-md-4 col-sm-6 col-xs-12" style="border-style: solid; border-width: 1px; height: 200px " onclick='divclick(<?php echo $idd ?>)'>
             <div class="col-sm-6">
-            <p><?php echo $row['name'];?></p>
-            <img src="../public/images/<?php echo $row['image']?>" width="150" height="150">
+            <p><?php echo $datas->name;?></p>
+            <img src="../public/images/<?php echo $datas->image?>" width="150" height="150">
             </div>
             <div class="col-sm-6">
-                <p>SKU: <?php echo $row['SKU'];?></p>
+                <p>SKU: <?php echo $datas->SKU;?></p>
                 <p>Price <?php if(isset($firstprice)){echo"<strike>$firstprice</strike> &#8364;<br> ";} $firstprice= null; echo "$price &#8364"; ?></p>
                 <p>Rate <?php echo bcdiv($rowrate['avg'],1,2);?></p>
                 <p>number of reviews <?php echo  $rowrev['txt'];?></p>
@@ -302,7 +306,7 @@ $idd =$row['SKU'];?>
         output2.innerHTML = this.value;
     }
 
-    
+
     function divclick(x){
         window.location.href = "../public/productinfo?proid="+x;
     };

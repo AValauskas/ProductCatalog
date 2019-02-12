@@ -4,38 +4,40 @@
 <?php
 $sku=$_GET['proid'];
 $dbc = database();
-      $sql="select * from product where SKU ='$sku'";
-      $data = mysqli_query($dbc, $sql);
-      $row = mysqli_fetch_assoc($data);
-        $name=$row['name'];
+$data=DB::table('product')
+    ->where('SKU','=',$sku)
+    ->first();
+        $name=$data->name;
 
-$reviewssql="select * from review where fk_ProductSKU=$sku ";
-$datareviews = mysqli_query($dbc, $reviewssql);
+$datareviews=DB::table('review')
+    ->where('fk_ProductSKU','=',$sku)
+    ->get();
 
-$sqltax="select * from money";
-$datatax = mysqli_query($dbc, $sqltax);
-$rowtax = mysqli_fetch_assoc($datatax);
+$datatax = DB::table('money')
+    ->first();
+$name=$data->name;
 
 
-if($row['tax']==1 && $row['discount']>0)
+
+if($data->tax==1 && $data->discount>0)
 {
     //yra pvm
-    $firstprice= $price=$row['base_price']+$row['base_price']*$rowtax['taxp']/100;
-    $price=$row['base_price']+$row['base_price']*$rowtax['taxp']/100-$row['base_price']*$row['discount']/100;
+    $firstprice= $price=$data->base_price+$data->base_price*$datatax->taxp/100;
+    $price=$data->base_price+$data->base_price*$datatax->taxp/100-$data->base_price * $data->discount/100;
     $withtax="the price we apply with taxes";
 
-}else if ($row['tax']==1 && $row['discount']==0 )
+}else if ($data->tax==1 && $data->discount==0 )
 {
-    $price=$row['base_price']+$row['base_price']*$rowtax['taxp']/100-$row['base_price']*$rowtax['global_discount']/100;
+    $price=$data->base_price+$data->base_price*$datatax->taxp/100-$data->base_price*$datatax->global_discount/100;
     $withtax="the price we apply with taxes";
 }
-else if($row['tax']==0 && $row['discount']>0){
-    $firstprice= $price=$row['base_price']+$row['base_price']*$rowtax['taxp']/100;
-    $price=$row['base_price']-$row['base_price']*$row['discount']/100;
+else if($data->tax==0 && $data->discount>0){
+    $firstprice= $price=$data->base_price+$data->base_price*$datatax->taxp/100;
+    $price=$data->base_price-$data->base_price*$data->discount/100;
     $withtax="the price we apply without taxes";
 }
 else{
-    $price=$row['base_price']-$row['base_price']*$rowtax['global_discount']/100;
+    $price=$data->base_price-$data->base_price*$datatax->global_discount/100;
     $withtax="the price we apply without taxes";
 }
 
@@ -52,14 +54,14 @@ $rowrate = mysqli_fetch_assoc($ratedata);
     <div class="row">
         <div class="col-sm-6">
             <h2><?php echo $name ?></h2>
-            <p><?php echo $row['description'] ?></p>
+            <p><?php echo $data->description ?></p>
             <br><br>
             <h2>Price <?php if(isset($firstprice)){echo"<strike>$firstprice &#8364;</strike> <br> ";} $firstprice= null; echo "$price &#8364"; ?></h2>
             <br><br>
             <p><?php echo $withtax ?></p>
         </div>
         <div class="col-sm-4">
-            <p><img src="../public/images/<?php echo $row['image']?>" width="300" height="300"></p>
+            <p><img src="../public/images/<?php echo $data->image?>" width="300" height="300"></p>
         </div>
         <div class="col-sm-2">
             <h3>Rankings</h3>
@@ -119,10 +121,10 @@ $rowrate = mysqli_fetch_assoc($ratedata);
 <h2>Reviews</h2>
 <tbody id="list-item">
 <?php
-while($rowrevs = mysqli_fetch_array($datareviews)) {
+foreach($datareviews as $review) {
 ?>
 <tr>
-    <td><?php echo $rowrevs['text'];?></td>
+    <td><?php echo $review->text;?></td>
 </tr>
 <?php }?>
 </tbody>
